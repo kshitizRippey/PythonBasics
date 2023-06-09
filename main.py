@@ -20,7 +20,8 @@ async def create_user(user: User):
 @app.post("/login")
 async def root(user: User):
     response = {"error": True, "message": "User does not exist!"}
-    password = user.password.encode('utf-8')
+    password = user.password
+    password = password.encode('utf-8')
     hashed_password = get_stored_password(user.username)
     if hashed_password is not None:
         if bcrypt.checkpw(password, hashed_password):

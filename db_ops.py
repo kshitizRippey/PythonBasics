@@ -37,7 +37,3 @@ def get_stored_password(username):
         result = cursor.execute(query, (username,)).fetchone()
         if result is not None:
             return result[0]
-
-
-if __name__ == '__main__':
-    print(get_stored_password('testuser12'))
