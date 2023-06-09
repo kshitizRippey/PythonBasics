@@ -15,6 +15,7 @@ def insert_user(username, password) -> dict:
                 cursor.execute(query, (username, password))
                 status = False
                 message = f"User {username} created successfully!"
+                conn.commit()
             except sqlite3.IntegrityError as e:
                 print(e)
                 message = f"User {username} already exists!"
@@ -27,3 +28,16 @@ def insert_user(username, password) -> dict:
             }
     except sqlite3.DatabaseError as e:
         print(e)
+
+
+def get_stored_password(username):
+    with get_connection('python_basics') as conn:
+        cursor = conn.cursor()
+        query = f'SELECT password FROM user WHERE username=?'
+        result = cursor.execute(query, (username,)).fetchone()
+        if result is not None:
+            return result[0]
+
+
+if __name__ == '__main__':
+    print(get_stored_password('testuser12'))
