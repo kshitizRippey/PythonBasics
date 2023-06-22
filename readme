@@ -1,0 +1,4 @@
+secret generated using pythons secrets package
+import secret
+secrets.token_hex(16)
+
