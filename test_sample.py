@@ -5,6 +5,10 @@ from main import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)
+expired_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9' \
+                '.eyJ1c2VybmFtZSI6InRlc3R1c2VyMTIzIiwiZXhwaXJ5IjoxNjg3NzcyODEwLjEwNDE2Nn0' \
+                '.YMBoMpg8jEGeZ5ipA2S98i7LyUpJzMuy_-Pbqpw5ujE'
+valid_token = client.post("/login", json={"username": "test", "password": "test"}).json()["access_token"]
 
 
 def test_read_main():
@@ -53,3 +57,45 @@ def test_products_list():
     for i in response.json():
         assert type(i) == dict
         assert len(i) == 5
+
+
+def test_create_order_with_expired_token():
+    response = client.post("/create", json={"token": expired_token, "product_id": 2, "quantity": 10})
+    assert response.status_code == 200
+    assert response.json() == {"message": "User isn't logged in!"}
+
+
+def test_create_order_with_valid_token():
+    response = client.post("/create", json={"token": valid_token, "product_id": 2, "quantity": 10})
+    assert response.status_code == 200
+    assert response.json()["message"] == "Order created!"
+    assert type(response.json()["order_id"]) is int
+
+
+def test_check_order_with_valid_token():
+    response = client.post("/read", json={"token": valid_token, "order_id": 19})
+    assert response.status_code == 200
+    assert type(response.json()["order_id"]) is int
+    assert type(response.json()["order_id"]) is int
+    assert type(response.json()["product_id"]) is int
+    assert type(response.json()["user_id"]) is int
+    assert type(response.json()["created_at"]) is str
+
+
+def test_check_order_with_expired_token():
+    response = client.post("/read", json={"token": expired_token, "order_id": 19})
+    assert response.status_code == 200
+    assert response.json() == {"message": "User isn't logged in!"}
+
+
+def test_check_non_existent_order():
+    response = client.post("/read", json={"token": expired_token, "order_id": 100})
+    assert response.status_code == 200
+    assert response.json() == {"message": "User isn't logged in!"}
+
+
+# user x shouldn't be able to view order created by user y
+def test_check_non_authorized_order_view():
+    response = client.post("/read", json={"token": expired_token, "order_id": 19})
+    assert response.status_code == 200
+    assert response.json() == {"message": "User isn't logged in!"}
