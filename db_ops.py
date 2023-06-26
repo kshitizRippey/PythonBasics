@@ -76,11 +76,11 @@ def add_order(quantity, created_at, user_id, product_id):
         return {"message": "Order couldn't be created!"}
 
 
-def get_order(order_id: int):
+def get_order(order_id: int, user_id: int):
     with get_connection('python_basics') as conn:
         cursor = conn.cursor()
-        query = 'SELECT * FROM "order" WHERE order_id=?'
-        cursor.execute(query, (order_id,))
+        query = 'SELECT * FROM "order" WHERE order_id=? and user_id=?'
+        cursor.execute(query, (order_id, user_id))
         result = cursor.fetchone()
         if result is None:
             return {"message": "Order doesn't exist!"}
@@ -88,21 +88,22 @@ def get_order(order_id: int):
         return result
 
 
-def update_order(quantity, order_id):
+def update_order(quantity: int, order_id: int, user_id: int):
     with get_connection('python_basics') as conn:
         cursor = conn.cursor()
-        query = 'UPDATE "order" SET quantity=? WHERE order_id=?'
-        cursor.execute(query, (quantity, order_id,))
+        query = 'UPDATE "order" SET quantity=? WHERE order_id=? AND user_id=?'
+        cursor.execute(query, (quantity, order_id, user_id))
         conn.commit()
         if cursor.rowcount > 0:
             return {"message": "Order updated", "order_id": order_id}
 
 
-def cancel_order(order_id):
+def cancel_order(order_id, user_id):
     with get_connection('python_basics') as conn:
         cursor = conn.cursor()
-        query = 'DELETE FROM "order" WHERE order_id=?'
-        cursor.execute(query, (order_id,))
+        query = 'DELETE FROM "order" WHERE order_id=? AND user_id=?'
+        cursor.execute(query, (order_id, user_id))
+        conn.commit()
         if cursor.rowcount == 0:
             return {"message": "Order doesn't exist!"}
         return {"message": "Order cancelled!", "order_id": order_id}

@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import FastAPI
 from models import User, CreateOrder, Order, UpdateOrder
 from db_ops import insert_user, get_stored_password, get_user_id
-from auth.handle_jwt import sign_jwt, is_logged_in, get_user_name
+from auth.handle_jwt import sign_jwt, is_logged_in
 from db_ops import get_products, add_order, get_order, update_order, cancel_order
 
 app = FastAPI()
@@ -58,7 +58,8 @@ async def read(order: Order):
     token = order.token
     if is_logged_in(token):
         order_id = order.order_id
-        return get_order(order_id=order_id)
+        user_id = get_user_id(token).get("user_id")
+        return get_order(order_id=order_id, user_id=user_id)
     else:
         return {"message": "User isn't logged in!"}
 
@@ -68,7 +69,8 @@ async def update(order: UpdateOrder):
     token = order.token
     if is_logged_in(token):
         order_id = order.order_id
-        return update_order(order_id=order_id, quantity=order.quantity)
+        user_id = get_user_id(token).get("user_id")
+        return update_order(order_id=order_id, quantity=order.quantity, user_id=user_id)
     else:
         return {"message": "User isn't logged in!"}
 
@@ -76,8 +78,9 @@ async def update(order: UpdateOrder):
 @app.post("/delete")
 async def cancel(order: Order):
     token = order.token
+    user_id = get_user_id(token)
     if is_logged_in(token):
         order_id = order.order_id
-        return cancel_order(order_id)
+        return cancel_order(order_id, user_id)
     else:
         return {"message": "User isn't logged in!"}
