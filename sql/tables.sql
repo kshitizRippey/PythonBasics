@@ -33,3 +33,15 @@ CREATE TABLE IF NOT EXISTS "order"
     foreign key (user_id) references user,
     foreign key (product_id) references product
 );
+
+CREATE TABLE IF NOT EXISTS canceled_orders
+(
+    order_id   integer PRIMARY KEY AUTOINCREMENT,
+    quantity   integer,
+    created_at text,
+    user_id    integer,
+    product_id integer,
+    foreign key (user_id) references user,
+    foreign key (product_id) references product
+);
+

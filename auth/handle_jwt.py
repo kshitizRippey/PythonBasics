@@ -8,7 +8,7 @@ SECRET = os.getenv("SECRET")
 ALGORITHM = os.getenv("ALGORITHM")
 
 
-def sign_jwt(username: str):
+def sign_jwt(username: str) -> str:
     payload = {
         "username": username,
         "expiry": time.time() + 3600
@@ -17,10 +17,20 @@ def sign_jwt(username: str):
     return token
 
 
-def decode_jwt(token: str):
+def decode_jwt(token: str) -> dict:
     try:
         decode_token = jwt.decode(token, SECRET, ALGORITHM)
-        if decode_token.get["expires"] >= time.time():
+        if decode_token["expiry"] >= time.time():
             return decode_token
     except:
         return {}
+
+
+def is_logged_in(token: str) -> bool:
+    payload = decode_jwt(token)
+    return True if payload else False
+
+
+def get_user_name(token: str) -> str:
+    payload = decode_jwt(token)
+    return payload.get("username")
