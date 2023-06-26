@@ -9,6 +9,11 @@ from db_ops import get_products, add_order, get_order, update_order, cancel_orde
 app = FastAPI()
 
 
+@app.get("/")
+async def home():
+    return {"message": "Hello World"}
+
+
 @app.post("/signup")
 async def signup(user: User):
     username = user.username
@@ -78,7 +83,7 @@ async def update(order: UpdateOrder):
 @app.post("/delete")
 async def cancel(order: Order):
     token = order.token
-    user_id = get_user_id(token)
+    user_id = get_user_id(token).get("user_id")
     if is_logged_in(token):
         order_id = order.order_id
         return cancel_order(order_id, user_id)
