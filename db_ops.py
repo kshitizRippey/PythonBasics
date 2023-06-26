@@ -96,6 +96,7 @@ def update_order(quantity: int, order_id: int, user_id: int):
         conn.commit()
         if cursor.rowcount > 0:
             return {"message": "Order updated", "order_id": order_id}
+        return {"message": "Order doesn't exist!"}
 
 
 def cancel_order(order_id, user_id):

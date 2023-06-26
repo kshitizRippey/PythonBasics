@@ -99,3 +99,22 @@ def test_check_non_authorized_order_view():
     response = client.post("/read", json={"token": expired_token, "order_id": 19})
     assert response.status_code == 200
     assert response.json() == {"message": "User isn't logged in!"}
+
+
+def test_update_order_with_expired_token():
+    response = client.post("/update", json={"token": expired_token, "order_id": 5, "quantity": 10})
+    assert response.status_code == 200
+    assert response.json() == {"message": "User isn't logged in!"}
+
+
+def test_update_order_with_non_authorized_user():
+    response = client.post("/update", json={"token": valid_token, "order_id": 5, "quantity": 10})
+    assert response.status_code == 200
+    assert response.json() == {"message": "Order doesn't exist!"}
+
+
+# needs work
+def test_update_order_with_authorized_user():
+    response = client.post("/update", json={"token": valid_token, "order_id": 38, "quantity": 15})
+    assert response.status_code == 200
+    assert response.json() == {"message": "Order updated", "order_id": 38}
