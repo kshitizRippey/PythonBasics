@@ -1,6 +1,6 @@
 import logging
 import sqlite3
-from auth.handle_jwt import decode_jwt
+from handle_jwt import decode_jwt
 
 
 def get_connection(db_name) -> sqlite3.Connection:

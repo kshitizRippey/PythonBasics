@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import FastAPI
 from models import User, CreateOrder, Order, UpdateOrder
 from db_ops import insert_user, get_stored_password, get_user_id
-from auth.handle_jwt import sign_jwt, is_logged_in
+from handle_jwt import sign_jwt, is_logged_in
 from db_ops import get_products, add_order, get_order, update_order, cancel_order
 
 app = FastAPI()
