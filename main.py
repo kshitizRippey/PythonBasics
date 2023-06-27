@@ -83,9 +83,9 @@ async def update(order: UpdateOrder):
 @app.post("/delete")
 async def cancel(order: Order):
     token = order.token
-    user_id = get_user_id(token).get("user_id")
     if is_logged_in(token):
         order_id = order.order_id
+        user_id = get_user_id(token).get("user_id")
         return cancel_order(order_id, user_id)
     else:
         return {"message": "User isn't logged in!"}

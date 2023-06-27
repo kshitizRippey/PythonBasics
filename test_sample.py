@@ -95,26 +95,52 @@ def test_check_non_existent_order():
 
 
 # user x shouldn't be able to view order created by user y
-def test_check_non_authorized_order_view():
+def test_check_unauthorized_order_view():
     response = client.post("/read", json={"token": expired_token, "order_id": 19})
     assert response.status_code == 200
     assert response.json() == {"message": "User isn't logged in!"}
 
 
 def test_update_order_with_expired_token():
-    response = client.post("/update", json={"token": expired_token, "order_id": 5, "quantity": 10})
+    response = client.post("/update", json={"token": expired_token, "order_id": 14, "quantity": 10})
     assert response.status_code == 200
     assert response.json() == {"message": "User isn't logged in!"}
 
 
-def test_update_order_with_non_authorized_user():
-    response = client.post("/update", json={"token": valid_token, "order_id": 5, "quantity": 10})
+def test_update_order_with_unauthorized_user():
+    response = client.post("/update", json={"token": valid_token, "order_id": 11, "quantity": 10})
     assert response.status_code == 200
     assert response.json() == {"message": "Order doesn't exist!"}
 
 
 # needs work
 def test_update_order_with_authorized_user():
-    response = client.post("/update", json={"token": valid_token, "order_id": 38, "quantity": 15})
+    order_id = 14
+    response = client.post("/update", json={"token": valid_token, "order_id": order_id, "quantity": 15})
     assert response.status_code == 200
-    assert response.json() == {"message": "Order updated", "order_id": 38}
+    assert response.json() == {"message": "Order updated", "order_id": order_id}
+
+
+def test_cancel_order_with_unauthorized_user():
+    response = client.post("/delete", json={"token": expired_token, "order_id": 14})
+    assert response.status_code == 200
+    assert response.json() == {"message": "User isn't logged in!"}
+
+
+def test_cancel_order_with_non_existing_order():
+    response = response = client.post("/delete", json={"token": valid_token, "order_id": 11})
+    assert response.status_code == 200
+    assert response.json() == {"message": "Order doesn't exist!"}
+
+
+def test_cancel_order_with_non_owner_user():
+    response = client.post("/delete", json={"token": valid_token, "order_id": 38})
+    assert response.status_code == 200
+    assert response.json() == {"message": "Order doesn't exist!"}
+
+
+def test_cancel_order_with_authorized_user():
+    order_id = 35
+    response = client.post("/delete", json={"token": valid_token, "order_id": order_id})
+    assert response.status_code == 200
+    assert response.json() == {"message": "Order cancelled!", "order_id": order_id}
